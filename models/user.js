@@ -12,8 +12,8 @@ var User = new Schema({
       default: ''
   },
   admin:   {
-      type: Boolean,
-      default: false
+    type: Boolean,
+    default: false
   }
 });
 
