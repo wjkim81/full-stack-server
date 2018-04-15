@@ -15,6 +15,7 @@ var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var uploadRouter = require('./routes/uploadRouter');
+var favoriteRouter  = require('./routes/favoriteRouter');
 
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -45,7 +46,7 @@ app.all('*', (req, res, next) => {
 });
 
 // view engine setup
-app.set('views', path.join(__dirname, 'public'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
@@ -79,6 +80,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 app.use('/imageUpload', uploadRouter);
+app.use('/favorites', favoriteRouter);
 
 
 // catch 404 and forward to error handler

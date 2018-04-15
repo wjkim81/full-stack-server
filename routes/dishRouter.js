@@ -167,6 +167,7 @@ dishRouter.route('/:dishId/comments/:commentId')
   Dishes.findById(req.params.dishId)
   .populate('comments.author')
   .then((dish) => {
+    //console.log(dish.comments);
     if (dish != null && dish.comments.id(req.params.commentId) != null) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
@@ -195,8 +196,8 @@ dishRouter.route('/:dishId/comments/:commentId')
   .then((dish) => {
     if (dish != null && dish.comments.id(req.params.commentId) != null) {
       //console.log(dish.comment.id(req.params.commentId).author.equals(req.user._id));
-      console.log(`req.user._id: ${req.user._id}`);
-      console.log(dish.comments.id(req.params.commentId).author);
+      //console.log(`req.user._id: ${req.user._id}`);
+      //console.log(dish.comments.id(req.params.commentId).author);
       if (dish.comments.id(req.params.commentId).author.equals(req.user._id)) {
         if (req.body.rating) {
           dish.comments.id(req.params.commentId).rating = req.body.rating;
