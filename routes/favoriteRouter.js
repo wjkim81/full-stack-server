@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
 
-const Favorites = require('../models/favorites');
+const Favorites = require('../models/favorite');
 
 const favoriteRouter = express.Router();
 
@@ -74,8 +74,27 @@ favoriteRouter.route('/')
 favoriteRouter.route('/:dishId')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200)} )
 .get(cors.cors, (req,res,next) => {
-  res.statusCode = 403;
-  res.end('GET operation not supported on /favorites/' + req.params.dishId);
+  Favorites.findOne({user: req.user._id})
+  .then((favorites) => {
+    if (!favorites) {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      return res.json({"exists": false, "favorites": favorites});
+    } else {
+      if (favorites.dishes.indexOf(req.params.dishId) < 0) {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        return res.json({"exists": false, "favorites": favorites});
+      } else {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        return res.json({"exists": true, "favorites": favorites});
+      }
+    }
+  }, (err) => next(err))
+  .catch((err) => next(err));
+  //res.statusCode = 403;
+  //res.end('GET operation not supported on /favorites/' + req.params.dishId);
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
   Favorites.findOne({"user": req.user._id})
@@ -110,19 +129,24 @@ favoriteRouter.route('/:dishId')
       //console.log(favorite.dishes);
       let index = favorite.dishes.indexOf(req.params.dishId);
       //console.log('index: ', index);
-      if (index !== -1) {
+      if (index >= 0) {
         favorite.dishes.splice(index, 1);
         favorite.save()
         .then((favorite) => {
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.json(favorite);
-          }, (err) => next(err));
+          Favorites.findById(favorite._id)
+          .populate('user')
+          .populate('dishes')
+          .then((favorite) => {
+            console.log('Favorite Dish Deleted!');
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(favorite);
+          })
+        }, (err) => next(err));
       } else {
-        console.log('not favorited');
+        //console.log('not favorited');
         err = new Error('User ' + req.user._id + ' has not favorited dish ' + req.params.dishId);
         err.status = 404;
-        console.log('next error')
         return next(err);
       }
     } else {
