@@ -18,10 +18,16 @@ favoriteRouter.route('/')
   .populate('user')
   .populate('dishes')
   .then((favorites) => {
-    console.log(favorites);
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.json(favorites);
+    //console.log(favorites);
+    if (favorites !== null) {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(favorites);
+    } else {
+      err = new Error('User ' + req.user._id + ' does not have any favorites');
+      err.status = 404;
+      return next(err);
+    }
   }, (err) => next(err))
   .catch((err) => next(err));
 })

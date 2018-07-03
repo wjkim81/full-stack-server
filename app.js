@@ -9,6 +9,8 @@ var passport = require('passport');
 var authenticate = require('./authenticate');
 var config = require('./config');
 
+var cors = require('cors');
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
@@ -74,6 +76,7 @@ app.use('/users', users);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(cors({origin: 'http://localhost:4200'}));
 //app.use('/', index);
 //app.use('/users', users);
 app.use('/dishes', dishRouter);
